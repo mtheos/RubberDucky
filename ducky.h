@@ -25,10 +25,12 @@ private:
     void getTerminalLinux();
     void getTerminalWindows();
     void getTerminalOSX();
+    void delayBy(int time);
     char commandToCode(const String &key);
     void sendLine(const String &line);
     void sendInput(const String &input);
     void sendCombination(char *keys);
+    void sendCombination(String line);
     void sendKey(char c);
     void pressEnter();
 };
