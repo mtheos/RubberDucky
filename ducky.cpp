@@ -1,14 +1,16 @@
 #include "Keyboard.h"
 #include "ducky.h"
 
-#define TERMINAL "term"
-#define RUN "run"
-#define KEYS "keys"
-#define OS "os"
-#define LISTEN "listen"
-#define KEEP "keep"
-#define SLEEP "sleep"
-#define REM "rem"
+// :: prefix is a cheat to make parsing easier
+#define TERMINAL "::term"
+#define RUN "::run"
+#define KEYS "::keys"
+#define OS "::os"
+#define SLEEP "::sleep"
+#define DELAY "::delay"
+#define REM "::rem"
+
+#define DEBUG false
 
 Ducky::Ducky () = default;
 
@@ -17,9 +19,8 @@ Ducky::Ducky(OSType os) {
 }
 
 void Ducky::execute(File f) {
-    if (file) {
+    if (file)
         file.close();
-    }
     file = f;
     while(file.available())
         executeLine(file.readStringUntil('\n'));
@@ -28,54 +29,61 @@ void Ducky::execute(File f) {
 
 void Ducky::executeLine(const String &line) {
     currentLine++;
+    if (DEBUG)
+        Serial.println("> [" + line + "]");
     if (line.length() == 0)
         return; // Empty line
 
     // Escaped line, send the rest as is
-    if (line.startsWith("\\"))
+    else if (line.startsWith("\\"))
         sendLine(line.substring(1));
 
     // Not a command, send as is
-    if (!line.startsWith("::"))
+    else if (!line.startsWith("::"))
         sendLine(line);
 
-    // Only thing left is a command
-    int separator = line.indexOf(' ');
-    String cmd = line.substring(2, separator);
-    cmd.toLowerCase();
-    if (cmd == TERMINAL) {
-        getTerminal();
-    } else if (cmd == RUN) {
-        runProgram(line.substring(separator + 1));
-    } else if (cmd == KEYS) {
+    else {
+        // Only thing left is a command
+        int separateAt = line.indexOf(' ');
+        String cmd = line.substring(0, separateAt);
+        cmd.toLowerCase();
+        if (DEBUG)
+            Serial.println("Command is: [" + cmd + "]");
 
-        line += " ";
-        while ((line = line.substring(separator + 1)) != "") {
-            char key = commandToCode(line.substring(0, line.indexOf(' ')));
-            Keyboard.press(1);
-            separator = line.indexOf(' ');
+        // Terminal has proven to be a strange edge case
+        if (cmd.startsWith(TERMINAL)) {
+            getTerminal();
+        } else if (cmd == RUN) {
+            runProgram(line.substring(separateAt + 1));
+        } else if (cmd == KEYS) {
+            sendCombination(line);
+        } else if (cmd == OS) {
+            setOS(line.substring(separateAt + 1));
+        } else if (cmd == SLEEP || cmd == DELAY) {
+            delayBy(line.substring(separateAt + 1).toInt());
+        } else if (cmd == REM) {
+            // Comment, do nothing
+        } else {
+            Serial.print("(Line ");
+            Serial.print(currentLine);
+            Serial.print(") Unknown: [");
+            Serial.println(line + "]");
+            // Maybe log to serial/file unknown command encountered
         }
-        Keyboard.releaseAll();
-    } else if (cmd == OS) {
-        setOS(line.substring(separator + 1));
-    } else if (cmd == LISTEN) {
-        // TODO listen for keystrokes before continuing
-    } else if (cmd == KEEP) {
-        // TODO save what comes next
-    } else if (cmd == SLEEP) {
-        delay(line.substring(separator + 1).toInt());
-    } else if (cmd == REM) {
-        // Comment, do nothing
-    } else {
-        Serial.print("(Line ");
-        Serial.print(currentLine);
-        Serial.print(") Unknown: ");
-        Serial.println(line);
-        // Maybe log to serial/file unknown command encountered
     }
+    if (DEBUG)
+        Serial.println();
+}
+
+void Ducky::delayBy(int time) {
+    if (DEBUG)
+        Serial.println("Sleeping for " [time]);
+    delay(time);
 }
 
 void Ducky::setOS(const String &os) {
+    if (DEBUG)
+        Serial.println("Setting OS to " + os);
     if (os == "linux")
         osType = OSType::Linux;
     else if (os == "windows")
@@ -85,6 +93,8 @@ void Ducky::setOS(const String &os) {
 }
 
 void Ducky::runProgram(const String &programName) {
+    if (DEBUG)
+        Serial.println("Running Program " + programName);
     switch (osType) {
         case OSType::Linux:
             runProgramLinux(programName);
@@ -118,6 +128,8 @@ void Ducky::runProgramOSX(const String &programName) {
 }
 
 void Ducky::getTerminal() {
+    if (DEBUG)
+        Serial.println("Getting Terminal");
     switch (osType) {
         case OSType::Linux:
             getTerminalLinux();
@@ -140,6 +152,7 @@ void Ducky::getTerminalWindows() {
     sendCombination(keys);
     sendInput("powershell");
     keys[0] = KEY_LEFT_CTRL; keys[1] = KEY_LEFT_SHIFT; keys[2] = KEY_RETURN;
+    sendCombination(keys);
     sendKey(KEY_LEFT_ARROW);
     pressEnter();
 }
@@ -150,27 +163,72 @@ void Ducky::getTerminalOSX() {
     pressEnter();
 }
 
-void Ducky::sendKey(char c) {
-    Keyboard.write(c); // Write is press + release
-}
-void Ducky::sendInput(const String &input) {
-    Keyboard.print(input);
-}
-void Ducky::sendLine(const String &line) {
-    Keyboard.println(line);
-}
-
 void Ducky::pressEnter() {
     sendKey(KEY_RETURN);
 //    Keyboard.press(KEY_RETURN);
 //    Keyboard.releaseAll();
 }
 
+void Ducky::sendKey(char c) {
+    if (!DEBUG)
+        Keyboard.write(c); // Write is press + release
+    else
+        Serial.print(c, HEX);
+}
+void Ducky::sendInput(const String &input) {
+    if (!DEBUG)
+        Keyboard.print(input);
+    else
+        Serial.print(input);
+}
+void Ducky::sendLine(const String &line) {
+    if (!DEBUG)
+        Keyboard.println(line);
+    else
+        Serial.println(line);
+}
+
+void Ducky::sendCombination(String line) {
+    int keyCount = 0, cKey = 0;
+    for (int i = 0; i < line.length(); i++) {
+        if (line.charAt(i) == ' ')
+            keyCount++;
+    }
+    if (DEBUG)
+        Serial.println(&"Combination keyCount = " [ keyCount]);
+    char *keys = (char *)malloc(sizeof(char) * keyCount);
+    line += ' '; // For end delimitation.
+    int separateAt = line.indexOf(' ');
+    while ((line = line.substring(separateAt + 1)) != "") {
+        char key = commandToCode(line.substring(0, line.indexOf(' ')));
+        keys[cKey++] = key;
+        separateAt = line.indexOf(' ');
+    }
+    sendCombination(keys);
+    if (DEBUG) {
+        Serial.print("Read ");
+        Serial.print(cKey);
+        Serial.println(" total");
+    }
+    free(keys);
+}
+
 void Ducky::sendCombination(char *keys) {
-    do {
-        Keyboard.press(keys[0]);
-    } while (++keys);
-    Keyboard.releaseAll();
+    if (!DEBUG) {
+        do {
+            Keyboard.press(keys[0]);
+        } while (++keys);
+        delayBy(100);
+        Keyboard.releaseAll();
+        delayBy(800);
+    } else {
+        Serial.print("Holding: [ ");
+        do {
+            Serial.print((char)keys[0], HEX);
+            Serial.print(' ');
+        } while (++keys);
+        Serial.println("]");
+    }
 }
 
 // Absolute filth.
