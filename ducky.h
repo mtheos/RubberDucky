@@ -12,7 +12,7 @@ public:
     void executeLine(const String &line);
     bool logging = false;
     OSType osType = OSType::Linux;
-    int defaultDelay = 10;
+    int defaultDelay = 100;
 private:
     int currentLine = 0;
     File file;
@@ -25,7 +25,8 @@ private:
     void getTerminalLinux();
     void getTerminalWindows();
     void getTerminalOSX();
-    void delayBy(int time);
+    void windowsUACShenanigans();
+    void delayFor(int time);
     char commandToCode(const String &key);
     void sendLine(const String &line);
     void sendInput(const String &input);

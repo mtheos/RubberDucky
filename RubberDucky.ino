@@ -22,19 +22,32 @@ void setup() {
   Serial.begin(9600);
   while (!Serial);
   Serial.println("Start.");
+  //error2("flash to start");
 
   if (!SD.begin(SD_SELECT))
     error2("Unable to select SD... Check connections");
   Serial.println("SD card found.");
   
-  Serial.print("Opening file for test...");
+  Serial.print("Opening file for read...");
   // Can only have 1 file open at a time... Close before opening another.
   File f = SD.open("0000.dck", FILE_READ);
   if (!f)
     error2("Error opening file!");
   Serial.println("success.");
-    
-  Ducky d(OSType::Linux);
+//  Serial.println("Listening.");
+//  Serial.println("Paused.");
+//  delay(10000);
+  Serial.println("Running.");
+  Ducky d(OSType::Windows);
+//  String line = "";
+//  while (line != "!exit") {
+//    line = Serial.readStringUntil('\n');
+//    if (line == "")
+//      continue;
+//    Serial.println("Sending: " + line);
+//    d.executeLine(line);
+//    Serial.println("Sent");
+//  }
   d.execute(f);
   f.close();
   
