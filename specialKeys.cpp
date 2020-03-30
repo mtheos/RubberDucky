@@ -1,7 +1,7 @@
 #include "Keyboard.h"
 #include "specialKeys.h"
 
-#define DEBUG
+//#define DEBUG
 
 // Absolute filth.
 char specialKeys::keyToCode(const String &key) {
