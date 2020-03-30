@@ -1,5 +1,6 @@
 #include "Keyboard.h"
 #include "ducky.h"
+#include "specialKeys.h"
 
 // :: prefix is a cheat to make parsing easier
 #define TERMINAL "::term"
@@ -8,11 +9,11 @@
 #define OS "::os"
 #define SLEEP "::sleep"
 #define DELAY "::delay"
-#define DEFDELAY "::defdelay"
+#define DEF_DELAY "::defdelay"
 #define REM "::rem"
 #define ENTER "::enter"
 
-#define DEBUG true
+#define DEBUG
 #define KEYBOARD_ON true
 
 Ducky::Ducky () = default;
@@ -32,7 +33,9 @@ void Ducky::execute(File f) {
 
 void Ducky::executeLine(const String &line) {
     currentLine++;
-    DEBUG && Serial.println("> [" + line + "]");
+#ifdef DEBUG
+    Serial.println("> [" + line + "]");
+#endif
     if (line.length() == 0)
         return; // Empty line
 
@@ -49,7 +52,9 @@ void Ducky::executeLine(const String &line) {
         int separateAt = line.indexOf(' ');
         String cmd = line.substring(0, separateAt);
         cmd.toLowerCase();
-        DEBUG && Serial.println("Command is: [" + cmd + "]");
+#ifdef DEBUG
+        Serial.println("Command is: [" + cmd + "]");
+#endif
 
         // Terminal has proven to be a strange edge case
         if (cmd.startsWith(TERMINAL)) {
@@ -62,30 +67,39 @@ void Ducky::executeLine(const String &line) {
             setOS(line.substring(separateAt + 1));
         } else if (cmd.startsWith(SLEEP) || cmd.startsWith(DELAY)) {
             delayFor(line.substring(separateAt + 1).toInt());
-        } else if (line.startsWith(DEFDELAY)) {
+        } else if (line.startsWith(DEF_DELAY)) {
             defaultDelay = line.substring(separateAt + 1).toInt();
         } else if (cmd.startsWith(REM)) {
                 // Comment, do nothing
         } else if (cmd.startsWith(ENTER)) {
             pressEnter();
         } else {
-            DEBUG && Serial.print("(Line ");
-            DEBUG && Serial.print(currentLine);
-            DEBUG && Serial.print(") Unknown: [");
-            DEBUG && Serial.println(line + "]");
+#ifdef DEBUG
+            Serial.print("(Line ");
+            Serial.print(currentLine);
+            Serial.print(") Unknown: [");
+            Serial.println(line + "]");
+#endif
             // Maybe log to serial/file unknown command encountered
         }
     }
 }
 
 void Ducky::delayFor(int time) {
-    DEBUG && Serial.print("Sleeping for ");
-    DEBUG && Serial.println(time);
+#ifdef DEBUG
+    Serial.print("Sleeping for ");
+    Serial.println(time);
+#endif
     delay(time);
+#ifdef DEBUG
+    Serial.println("Awake");
+#endif
 }
 
 void Ducky::setOS(const String &os) {
-    DEBUG && Serial.println("Setting OS to " + os);
+#ifdef DEBUG
+    Serial.println("Setting OS to " + os);
+#endif
     if (os == "linux")
         osType = OSType::Linux;
     else if (os == "windows")
@@ -95,7 +109,9 @@ void Ducky::setOS(const String &os) {
 }
 
 void Ducky::runProgram(const String &programName) {
-    DEBUG && Serial.println("Running Program " + programName);
+#ifdef DEBUG
+    Serial.println("Running Program " + programName);
+#endif
     switch (osType) {
         case OSType::Linux:
             runProgramLinux(programName);
@@ -137,7 +153,9 @@ void Ducky::runProgramOSX(const String &programName) {
 }
 
 void Ducky::getTerminal() {
-    DEBUG && Serial.println("Getting Terminal");
+#ifdef DEBUG
+    Serial.println("Getting Terminal");
+#endif
     switch (osType) {
         case OSType::Linux:
             getTerminalLinux();
@@ -188,15 +206,21 @@ void Ducky::pressEnter() {
 }
 
 void Ducky::sendKey(char c) {
-    DEBUG && Serial.print(c, HEX);
+#ifdef DEBUG
+    Serial.print(c, HEX);
+#endif
     KEYBOARD_ON && Keyboard.write(c); // Write is press + release
 }
 void Ducky::sendInput(const String &input) {
-    DEBUG && Serial.print(input);
+#ifdef DEBUG
+    Serial.print(input);
+#endif
     KEYBOARD_ON && Keyboard.print(input);
 }
 void Ducky::sendLine(const String &line) {
-    DEBUG && Serial.println(line);
+#ifdef DEBUG
+    Serial.println(line);
+#endif
     KEYBOARD_ON && Keyboard.println(line);
 }
 
@@ -206,120 +230,42 @@ void Ducky::sendCombination(String line) {
         if (line.charAt(i) == ' ')
             keyCount++;
     }
-    DEBUG && Serial.print("Combination keyCount = ");
-    DEBUG && Serial.print(keyCount);
-    DEBUG && Serial.println();
+#ifdef DEBUG
+    Serial.print("Combination keyCount = ");
+    Serial.print(keyCount);
+    Serial.println();
+#endif
     char *keys = (char *)malloc(sizeof(char) * keyCount);
     line += ' '; // For end delimitation.
     int separateAt = line.indexOf(' ');
     while ((line = line.substring(separateAt + 1)) != "") {
-        char key = commandToCode(line.substring(0, line.indexOf(' ')));
+        char key = specialKeys::keyToCode(line.substring(0, line.indexOf(' ')));
         keys[cKey++] = key;
         separateAt = line.indexOf(' ');
     }
-    DEBUG && Serial.print("Read ");
-    DEBUG && Serial.print(cKey);
-    DEBUG && Serial.println(" total");
+#ifdef DEBUG
+    Serial.print("Read ");
+    Serial.print(cKey);
+    Serial.println(" total");
+#endif
     sendCombination(keys);
     free(keys);
 }
 
+// Offt horrible #ifdef
 void Ducky::sendCombination(char *keys) {
-    DEBUG && Serial.print("Holding: [ ");
+#ifdef DEBUG
+    Serial.print("Holding: [ ");
+#endif
     do {
-        DEBUG && Serial.print(keys[0], HEX);
-        DEBUG && Serial.print(' ');
+#ifdef DEBUG
+        Serial.print(keys[0], HEX);
+        Serial.print(' ');
+#endif
         KEYBOARD_ON && Keyboard.press(keys[0]);
     } while (*(++keys));
-    DEBUG && Serial.println("]");
+#ifdef DEBUG
+    Serial.println("]");
+#endif
     /* KEYBOARD_ON && */ Keyboard.releaseAll();
-}
-
-// Absolute filth.
-char Ducky::commandToCode(const String &key) {
-    // If it's not a key string, it's a single character
-    char code = '\0';
-    if (key == "KEY_LEFT_CTRL")
-        code = KEY_LEFT_CTRL;
-    else if (key == "KEY_LEFT_SHIFT")
-        code = KEY_LEFT_SHIFT;
-    else if (key == "KEY_LEFT_ALT")
-        code = KEY_LEFT_ALT;
-    else if (key == "KEY_LEFT_GUI")
-        code = KEY_LEFT_GUI;
-    else if (key == "KEY_RIGHT_CTRL")
-        code = KEY_RIGHT_CTRL;
-    else if (key == "KEY_RIGHT_SHIFT")
-        code = KEY_RIGHT_SHIFT;
-    else if (key == "KEY_RIGHT_ALT")
-        code = KEY_RIGHT_ALT;
-    else if (key == "KEY_RIGHT_GUI")
-        code = KEY_RIGHT_GUI;
-    else if (key == "KEY_UP_ARROW")
-        code = KEY_UP_ARROW;
-    else if (key == "KEY_DOWN_ARROW")
-        code = KEY_DOWN_ARROW;
-    else if (key == "KEY_LEFT_ARROW")
-        code = KEY_LEFT_ARROW;
-    else if (key == "KEY_RIGHT_ARROW")
-        code = KEY_RIGHT_ARROW;
-    else if (key == "KEY_BACKSPACE")
-        code = KEY_BACKSPACE;
-    else if (key == "KEY_TAB")
-        code = KEY_TAB;
-    else if (key == "KEY_RETURN")
-        code = KEY_RETURN;
-    else if (key == "KEY_ESC")
-        code = KEY_ESC;
-    else if (key == "KEY_INSERT")
-        code = KEY_INSERT;
-    else if (key == "KEY_DELETE")
-        code = KEY_DELETE;
-    else if (key == "KEY_PAGE_UP")
-        code = KEY_PAGE_UP;
-    else if (key == "KEY_PAGE_DOWN")
-        code = KEY_PAGE_DOWN;
-    else if (key == "KEY_HOME")
-        code = KEY_HOME;
-    else if (key == "KEY_END")
-        code = KEY_END;
-    else if (key == "KEY_CAPS")
-        code = KEY_CAPS_LOCK;
-    else if (key == "KEY_F1")
-        code = KEY_F1;
-    else if (key == "KEY_F2")
-        code = KEY_F2;
-    else if (key == "KEY_F3")
-        code = KEY_F3;
-    else if (key == "KEY_F4")
-        code = KEY_F4;
-    else if (key == "KEY_F5")
-        code = KEY_F5;
-    else if (key == "KEY_F6")
-        code = KEY_F6;
-    else if (key == "KEY_F7")
-        code = KEY_F7;
-    else if (key == "KEY_F8")
-        code = KEY_F8;
-    else if (key == "KEY_F9")
-        code = KEY_F9;
-    else if (key == "KEY_F10")
-        code = KEY_F10;
-    else if (key == "KEY_F11")
-        code = KEY_F11;
-    else if (key == "KEY_F12")
-        code = KEY_F12;
-
-    if (DEBUG) {
-        code != '\0' && Serial.print("Command Key Found: ");
-        code == '\0' && Serial.print("Key Found: ");
-        code == '\0' && (code = key.charAt(0));
-        Serial.print(code, HEX);
-        Serial.println();
-    }
-
-    // Slight duplication with the above for debugging
-    if (code == '\0')
-        code = key.charAt(0);
-    return code;
 }

@@ -27,7 +27,6 @@ private:
     void getTerminalOSX();
     void windowsUACShenanigans();
     void delayFor(int time);
-    char commandToCode(const String &key);
     void sendLine(const String &line);
     void sendInput(const String &input);
     void sendCombination(char *keys);
