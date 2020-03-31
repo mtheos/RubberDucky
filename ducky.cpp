@@ -20,9 +20,9 @@ void Ducky::run() {
     while(loop) {
         String gpio = readGPIO();
         if (gpio == last_gpio) {
-            Blink::blinkDone(); // blinkDone takes 1.5 seconds, so this is effectively a short delay
-            delay(5000); // Make it a little longer as it takes times to set switches
-            Blink::blinkStarting();
+            Blink::blinkDone();     // blinkDone takes 1.5 seconds, so this is effectively a short delay
+            delay(5000);            // Make it a little longer as it take times to set switches
+            Blink::blinkStarting(); // blinkStaring only takes 400ms
             continue;
         }
         last_gpio = gpio;
