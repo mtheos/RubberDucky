@@ -8,7 +8,8 @@
 enum class OSType {
     Linux,
     Windows,
-    OSX
+    OSX,
+    Unknown
 };
 
 #endif //OSTYPE
