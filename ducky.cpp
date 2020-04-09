@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <SD.h>
+#include "FingerprintUSBHost.h"
 #include "ducky.h"
 #include "duckyParser.h"
 #include "blink.h"
@@ -27,9 +28,35 @@ void Ducky::run() {
         }
         last_gpio = gpio;
         Serial.println(gpio);
+        OSType osType;
         if (gpio == "0000") {
             Serial.println("Safe mode");
             continue;
+        } else if (gpio == "1111") {
+            Serial.println("Script Select");
+            osType = FingerprintUSBHost().guessHostOS();
+            switch (osType) {
+                case OSType::Linux:
+                    Serial.println("Linux detected");
+                    gpio = gpio + "_lin";
+                    break;
+                case OSType::Windows:
+                    Serial.println("Windows detected");
+                    gpio = gpio + "_win";
+                    break;
+                case OSType::OSX:
+                    Serial.println("OSX detected");
+                    gpio = gpio + "_osx";
+                    break;
+                case OSType::Unknown:
+                    Serial.println("OS not detected");
+                    break;
+            }
+        } else if (gpio[0] == '1') {
+            Serial.println("OS Select");
+            osType = FingerprintUSBHost().guessHostOS();
+        } else {
+            osType = OSType::Unknown;
         }
         if (!SD.begin(SD_SELECT))
             error("Unable to select SD... Check connections");
@@ -43,9 +70,7 @@ void Ducky::run() {
             error("Error opening file!");
         Serial.println("Success.");
         Serial.println("Running.");
-        // Determine OS
-        OSType os = OSType::Windows;
-        DuckyParser dp(os);
+        DuckyParser dp(osType);
         int err = dp.execute(f);
         f.close();
         if (err)

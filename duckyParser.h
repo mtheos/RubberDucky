@@ -11,7 +11,7 @@ public:
     int execute(File f);
     int executeLine(const String &line);
     bool logging = false;
-    OSType osType = OSType::Linux;
+    OSType osType = OSType::Unknown;
     int defaultDelay = 100;
 private:
     int currentLine = 0;

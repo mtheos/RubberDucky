@@ -110,6 +110,8 @@ void DuckyParser::setOS(const String &os) {
         osType = OSType::Windows;
     else if (os == "osx")
         osType = OSType::OSX;
+    else
+        osType = OSType::Unknown;
 }
 
 void DuckyParser::runProgram(const String &programName) {
@@ -125,6 +127,13 @@ void DuckyParser::runProgram(const String &programName) {
             break;
         case OSType::OSX:
             runProgramOSX(programName);
+            break;
+        case OSType::Unknown:
+            // Fail horribly
+#ifdef DEBUG
+            Serial.println("Run program called but OS not Set")
+#endif
+            exit(1);
             break;
     }
     delayFor(defaultDelay);
@@ -169,6 +178,13 @@ void DuckyParser::getTerminal() {
             break;
         case OSType::OSX:
             getTerminalOSX();
+            break;
+        case OSType::Unknown:
+            // Fail horribly
+#ifdef DEBUG
+            Serial.println("Get Terminal called but OS not Set")
+#endif
+            exit(1);
             break;
     }
     delayFor(defaultDelay);
