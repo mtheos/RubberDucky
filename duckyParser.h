@@ -7,7 +7,6 @@
 class DuckyParser {
 public:
     DuckyParser();
-    explicit DuckyParser(OSType os);
     int execute(File f);
     int executeLine(const String &line);
     bool logging = false;
@@ -15,8 +14,7 @@ public:
     int defaultDelay = 100;
 private:
     int currentLine = 0;
-    File file;
-    void setOS(const String &os);
+    void setOS(String os);
     void runProgram(const String &programName);
     void runProgramLinux(const String &programName);
     void runProgramWindows(const String &programName);

@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <SD.h>
-#include "FingerprintUSBHost.h"
 #include "ducky.h"
 #include "duckyParser.h"
 #include "blink.h"
@@ -28,57 +27,32 @@ void Ducky::run() {
         }
         last_gpio = gpio;
         Serial.println(gpio);
-        OSType osType;
         if (gpio == "0000") {
             Serial.println("Safe mode");
             continue;
-        } else if (gpio == "1111") {
-            Serial.println("Script Select");
-            osType = FingerprintUSBHost().guessHostOS();
-            switch (osType) {
-                case OSType::Linux:
-                    Serial.println("Linux detected");
-                    gpio = gpio + "_lin";
-                    break;
-                case OSType::Windows:
-                    Serial.println("Windows detected");
-                    gpio = gpio + "_win";
-                    break;
-                case OSType::OSX:
-                    Serial.println("OSX detected");
-                    gpio = gpio + "_osx";
-                    break;
-                case OSType::Unknown:
-                    Serial.println("OS not detected");
-                    break;
-            }
-        } else if (gpio[0] == '1') {
-            Serial.println("OS Select");
-            osType = FingerprintUSBHost().guessHostOS();
-        } else {
-            osType = OSType::Unknown;
         }
         if (!SD.begin(SD_SELECT))
             error("Unable to select SD... Check connections");
-        Serial.println("SD card found.");
-        Serial.print("Opening file \"");
-        Serial.print(gpio);
-        Serial.println(".dck\".");
+//        Serial.println("SD card found.");
+//        Serial.print("Opening file \"");
+//        Serial.print(gpio);
+//        Serial.println(".dck\".");
         // Can only have 1 file open at a time... Close before opening another.
         File f = SD.open(gpio + ".dck", FILE_READ);
         if (!f)
             error("Error opening file!");
-        Serial.println("Success.");
-        Serial.println("Running.");
-        DuckyParser dp(osType);
+//        Serial.println("Success.");
+//        Serial.println("Running.");
+        DuckyParser dp;
         int err = dp.execute(f);
         f.close();
+        Serial.print("Finished\nCode: ");
+        Serial.println(err);
         if (err)
             error("Parse error line: " + String(err));
         if (gpio == "Never")
             loop = false; // Stops infinite loop warnings
     }
-    Serial.println("Finished.");
 }
 
 void Ducky::error(const String &msg) {

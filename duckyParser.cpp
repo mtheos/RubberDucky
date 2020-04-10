@@ -9,32 +9,27 @@
 #define OS "::os"
 #define SLEEP "::sleep"
 #define DELAY "::delay"
-#define DEF_DELAY "::defdelay"
+#define SET_DELAY "::setdelay"
 #define REM "::rem"
 #define ENTER "::enter"
 
-//#define DEBUG
+#define DEBUG
 #define KEYBOARD_ON true
 
 DuckyParser::DuckyParser () = default;
 
-DuckyParser::DuckyParser(OSType os) {
-    osType = os;
-}
-
 int DuckyParser::execute(File f) {
-    if (file)
-        file.close();
-    file = f;
-    while(file.available())
+    while(f.available())
         // If error on line, return line number
-        if (executeLine(file.readStringUntil('\n')))
+        if (executeLine(f.readStringUntil('\n'))) // Terminator is not included
             return currentLine;
     return 0;
 }
 
 int DuckyParser::executeLine(const String &line) {
     currentLine++;
+    if (line.endsWith("\r")) // Windows carriage return
+        line = line.substring(0, line.length() - 1);
 #ifdef DEBUG
     Serial.println("> [" + line + "]");
 #endif
@@ -69,7 +64,7 @@ int DuckyParser::executeLine(const String &line) {
             setOS(line.substring(separateAt + 1));
         } else if (cmd.startsWith(SLEEP) || cmd.startsWith(DELAY)) {
             delayFor(line.substring(separateAt + 1).toInt());
-        } else if (line.startsWith(DEF_DELAY)) {
+        } else if (line.startsWith(SET_DELAY)) {
             defaultDelay = line.substring(separateAt + 1).toInt();
         } else if (cmd.startsWith(REM)) {
             // Comment, do nothing
@@ -100,9 +95,10 @@ void DuckyParser::delayFor(int time) {
 #endif
 }
 
-void DuckyParser::setOS(const String &os) {
+void DuckyParser::setOS(String os) {
+    os.toLowerCase();
 #ifdef DEBUG
-    Serial.println("Setting OS to " + os);
+    Serial.print("Setting OS to " + os);
 #endif
     if (os == "linux")
         osType = OSType::Linux;
@@ -110,8 +106,12 @@ void DuckyParser::setOS(const String &os) {
         osType = OSType::Windows;
     else if (os == "osx")
         osType = OSType::OSX;
-    else
+    else {
         osType = OSType::Unknown;
+#ifdef DEBUG
+        Serial.println("OS [" + os + "] not recognised");
+#endif
+    }
 }
 
 void DuckyParser::runProgram(const String &programName) {
@@ -131,7 +131,7 @@ void DuckyParser::runProgram(const String &programName) {
         case OSType::Unknown:
             // Fail horribly
 #ifdef DEBUG
-            Serial.println("Run program called but OS not Set")
+            Serial.println("Run program called but OS not Set");
 #endif
             exit(1);
             break;
@@ -182,7 +182,7 @@ void DuckyParser::getTerminal() {
         case OSType::Unknown:
             // Fail horribly
 #ifdef DEBUG
-            Serial.println("Get Terminal called but OS not Set")
+            Serial.println("Get Terminal called but OS not Set");
 #endif
             exit(1);
             break;

@@ -7,7 +7,9 @@
 char specialKeys::keyToCode(const String &key) {
     // If it's not a key string, it's a single character
     char code = '\0';
-    if (key == "KEY_LEFT_CTRL")
+    if (key == "KEY_SPACE")
+        code = 0x32; // Easier than handling ' ' explicitly in a script
+    else if (key == "KEY_LEFT_CTRL")
         code = KEY_LEFT_CTRL;
     else if (key == "KEY_LEFT_SHIFT")
         code = KEY_LEFT_SHIFT;
@@ -35,7 +37,7 @@ char specialKeys::keyToCode(const String &key) {
         code = KEY_BACKSPACE;
     else if (key == "KEY_TAB")
         code = KEY_TAB;
-    else if (key == "KEY_RETURN")
+    else if (key == "KEY_RETURN" || key == "KEY_ENTER") // More likely case
         code = KEY_RETURN;
     else if (key == "KEY_ESC")
         code = KEY_ESC;
