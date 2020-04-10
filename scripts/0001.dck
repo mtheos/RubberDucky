@@ -1,0 +1,49 @@
+::OS Windows
+::REM Script opens Notepad and types a message concerning locking the computer
+::REM Modified from Lock Me 0.3 hak5 rubber ducky script by SurfKahuna (RJC)
+
+::RUN notepad.exe
+::ENTER
+::ENTER
+          , ,\ ,'\,'\ ,'\ ,\ ,
+    ,  ,\/ \' `'     `   '  /|
+    |\/                      |
+    :                        |
+    :                        |
+     |                       |
+     |                       |
+     :               -.     _|
+     :                \     `.
+     |         ________:______\
+     :       ,'o       / o    ,
+     :       \       ,'-----./
+      \_      `--.--'        )
+     ,` `.              ,---'|
+     : `                     |
+      `,-'                   |
+      /      ,---.          ,'
+   ,-'            `-,------'
+   `.        ,--'
+     `-.____/
+            \
+::ENTER
+I will learn to lock my computer.
+I will learn to lock my computer.
+I will learn to lock my computer.
+I will learn to lock my computer.
+I will learn to lock my computer.
+I will learn to lock my computer.
+I will learn to lock my computer.
+I will learn to lock my computer.
+I will learn to lock my computer.
+I will learn to lock my computer.
+::ENTER
+::ENTER
+Please remember to lock your computer (Windows+L) when you step away from your desk.
+::ENTER
+Thank you.
+::DELAY 250
+::KEYS KEY_LEFT_ALT KEY_SPACE
+::DELAY 250
+x
+::KEYS KEY_LEFT_GUI l

