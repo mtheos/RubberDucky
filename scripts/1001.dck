@@ -1,1 +1,46 @@
-I am 1001
+::REM Script opens gedit and types a message concerning locking the computer
+::REM Modified from Lock Me 0.3 hak5 rubber ducky script by SurfKahuna (RJC)
+
+::OS Linux
+
+::RUN gedit
+::ENTER
+::ENTER
+          , ,\ ,'\,'\ ,'\ ,\ ,
+    ,  ,\/ \' `'     `   '  /|
+    |\/                      |
+    :                        |
+    :                        |
+     |                       |
+     |                       |
+     :               -.     _|
+     :                \     `.
+     |         ________:______\
+     :       ,'o       / o    ,
+     :       \       ,'-----./
+      \_      `--.--'        )
+     ,` `.              ,---'|
+     : `                     |
+      `,-'                   |
+      /      ,---.          ,'
+   ,-'            `-,------'
+   `.        ,--'
+     `-.____/
+            \
+::ENTER
+I will learn to lock my computer.
+I will learn to lock my computer.
+I will learn to lock my computer.
+I will learn to lock my computer.
+I will learn to lock my computer.
+I will learn to lock my computer.
+I will learn to lock my computer.
+I will learn to lock my computer.
+I will learn to lock my computer.
+I will learn to lock my computer.
+::ENTER
+::ENTER
+Please remember to lock your computer (GUI + L) when you step away from your desk.
+::ENTER
+Thank you.
+::KEYS KEY_LEFT_GUI l

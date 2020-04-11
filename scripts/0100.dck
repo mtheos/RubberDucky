@@ -1,5 +1,7 @@
-::OS Windows
 ::REM Obligatory Rick Roll
+
+::OS Windows
+
 ::RUN https://www.youtube.com/watch?v=dQw4w9WgXcQ
 ::DELAY 5000
 ::REM YouTube has stopped autoplay (or I have...)

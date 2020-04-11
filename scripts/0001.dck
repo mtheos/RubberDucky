@@ -1,6 +1,7 @@
-::OS Windows
 ::REM Script opens Notepad and types a message concerning locking the computer
 ::REM Modified from Lock Me 0.3 hak5 rubber ducky script by SurfKahuna (RJC)
+
+::OS Windows
 
 ::RUN notepad.exe
 ::ENTER

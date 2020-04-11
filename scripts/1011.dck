@@ -1,1 +1,16 @@
-I am 1011
+::REM Script Download and run file with terminal
+::REM Modified from mubix script
+
+::OS Linux
+
+::TERM
+cd /tmp
+::REM https://www.reddit.com/r/linuxmasterrace/comments/bwr6y1/my_friend_decided_to_improve_the_linux_wallpaper/
+source='https://i.redd.it/vfz1blyegd231.png'
+destination='delete_windows_tux.png'
+wget $source -O $destination
+::DELAY 1000
+
+::REM Mileage may vary
+xdg-open $destination
+exit

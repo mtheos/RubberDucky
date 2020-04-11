@@ -1,6 +1,8 @@
-::OS Windows
 ::REM Script Download and run file with hidden powershell window
 ::REM Modified from mubix script
+
+::OS Windows
+
 ::RUN powershell -windowstyle hidden
 cd $env:TEMP
 ::REM https://www.reddit.com/r/linuxmasterrace/comments/bwr6y1/my_friend_decided_to_improve_the_linux_wallpaper/
@@ -8,5 +10,5 @@ $source = 'https://i.redd.it/vfz1blyegd231.png'
 $destination = 'delete_windows_tux.png'
 Invoke-WebRequest $source -OutFile $destination
 ::DELAY 1000
-start-process delete_windows_tux.png
+start-process $destination
 exit

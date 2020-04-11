@@ -1,6 +1,8 @@
-::OS Windows
 ::REM Script Download and run file with powershell window
 ::REM Modified from mubix script
+
+::OS Windows
+
 ::RUN powershell
 cd $env:TEMP
 ::REM https://en.wikipedia.org/wiki/Tux_(mascot)
@@ -8,5 +10,5 @@ $source = 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Tux-simple.
 $destination = 'tux.png'
 Invoke-WebRequest $source -OutFile $destination
 ::DELAY 1000
-start-process tux.png
+start-process $destination
 exit
