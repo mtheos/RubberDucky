@@ -2,6 +2,8 @@
 
 Excuse the mess, Arduino projects don't play nice with structure :'(
 
+Edit: (Mostly) fixed the mess :)
+
 Blank linkes are ignored
 Any line that doesn't start with a command is sent as is (including carriage return)
 
