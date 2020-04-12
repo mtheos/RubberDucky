@@ -1,6 +1,6 @@
 
 #include <Arduino.h>
-#include "ducky.h"
+#include "src/ducky.h"
 
 void setup() {
 //    Serial.begin(9600);
