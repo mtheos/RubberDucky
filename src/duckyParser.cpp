@@ -140,7 +140,6 @@ void DuckyParser::runProgram(const String &programName) {
 }
 void DuckyParser::runProgramLinux(const String &programName) {
     char keys[2] = { (char)KEY_LEFT_GUI, '\0' };
-    delayFor(1000);
     sendCombination(keys);
     delayFor(2 * defaultDelay);
     sendInput(programName);
