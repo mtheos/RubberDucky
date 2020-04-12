@@ -35,16 +35,16 @@ void Ducky::run() {
         }
         if (!SD.begin(SD_SELECT))
             error("Unable to select SD... Check connections");
-//        Serial.println("SD card found.");
-//        Serial.print("Opening file \"");
-//        Serial.print(gpio);
-//        Serial.println(".dck\".");
+        // Serial.println("SD card found.");
+        // Serial.print("Opening file \"");
+        // Serial.print(gpio);
+        // Serial.println(".dck\".");
         // Can only have 1 file open at a time... Close before opening another.
         File f = SD.open(gpio + ".dck", FILE_READ);
         if (!f)
             error("Error opening file!");
-//        Serial.println("Success.");
-//        Serial.println("Running.");
+        // Serial.println("Success.");
+        // Serial.println("Running.");
         DuckyParser dp;
         int err = dp.execute(f);
         f.close();
