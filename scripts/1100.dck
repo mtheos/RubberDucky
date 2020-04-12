@@ -3,7 +3,10 @@
 ::OS Linux
 
 ::TERM
-https://www.youtube.com/watch?v=dQw4w9WgXcQ
+url=https://www.youtube.com/watch?v=dQw4w9WgXcQ
+(chrome "$url" || firefox "$url") &
+disown
+exit
 ::DELAY 5000
 ::REM YouTube has stopped autoplay (or I have...)
 ::KEYS KEY_SPACE

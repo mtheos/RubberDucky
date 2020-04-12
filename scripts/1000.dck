@@ -1,1 +1,21 @@
-I am 1000
+::REM Script Download and run file with terminal
+::REM Modified from mubix script
+
+::OS Linux
+
+::REM Manually open terminal / run program
+::KEYS KEY_LEFT_GUI
+::DELAY 1000
+terminal
+::DELAY 1000
+
+cd /tmp
+::REM https://en.wikipedia.org/wiki/Tux_(mascot)
+source='https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Tux-simple.svg/2000px-Tux-simple.svg.png'
+destination='tux.png'
+wget $source -O $destination
+::DELAY 1000
+
+::REM Mileage may vary
+xdg-open $destination
+exit
