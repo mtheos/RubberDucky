@@ -14,6 +14,8 @@
 Ducky::Ducky () = default;
 
 void Ducky::run() {
+    // Can take a little bit for the HID to initialize
+    delay(1000);
     initializeGPIO();
     bool loop = true;
     String last_gpio = "";

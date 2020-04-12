@@ -13,7 +13,7 @@
 #define REM "::rem"
 #define ENTER "::enter"
 
-#define DEBUG
+//#define DEBUG
 #define KEYBOARD_ON true
 
 DuckyParser::DuckyParser () = default;
@@ -139,11 +139,13 @@ void DuckyParser::runProgram(const String &programName) {
     delayFor(defaultDelay);
 }
 void DuckyParser::runProgramLinux(const String &programName) {
-    char keys[3] = { (char)KEY_LEFT_GUI, ' ', '\0' };
+    char keys[2] = { (char)KEY_LEFT_GUI, '\0' };
+    delayFor(1000);
     sendCombination(keys);
     delayFor(2 * defaultDelay);
     sendInput(programName);
     pressEnter();
+    delayFor(5 * defaultDelay);
 }
 void DuckyParser::runProgramWindows(const String &programName) {
     char keys[4] = { (char)KEY_LEFT_GUI, 'r', '\0', '\0' };
@@ -190,9 +192,10 @@ void DuckyParser::getTerminal() {
     delayFor(defaultDelay);
 }
 void DuckyParser::getTerminalLinux() {
-    char keys[4] = { (char)KEY_LEFT_ALT, (char)KEY_LEFT_CTRL, 't', '\0' };
-    sendCombination(keys);
-    delayFor(5 * defaultDelay);
+    runProgramLinux("terminal");
+//    char keys[4] = { (char)KEY_LEFT_ALT, (char)KEY_LEFT_CTRL, 't', '\0' };
+//    sendCombination(keys);
+//    delayFor(3 * defaultDelay);
 }
 void DuckyParser::getTerminalWindows() {
     runProgramWindows("powershell");
@@ -245,7 +248,7 @@ void DuckyParser::sendLine(const String &line) {
 }
 
 void DuckyParser::sendCombination(String line) {
-    int keyCount = 0, cKey = 0;
+    int keyCount = 1, cKey = 0;
     for (int i = 0; i < line.length(); i++) {
         if (line.charAt(i) == ' ')
             keyCount++;
@@ -263,6 +266,7 @@ void DuckyParser::sendCombination(String line) {
         keys[cKey++] = key;
         separateAt = line.indexOf(' ');
     }
+    keys[cKey] = '\0';
 #ifdef DEBUG
     Serial.print("Read ");
     Serial.print(cKey);
@@ -287,5 +291,6 @@ void DuckyParser::sendCombination(char *keys) {
 #ifdef DEBUG
     Serial.println("]");
 #endif
+    delayFor(200);
     /* KEYBOARD_ON && */ Keyboard.releaseAll();
 }
